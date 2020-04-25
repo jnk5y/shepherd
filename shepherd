@@ -12,8 +12,7 @@ update_services() {
   local detach_option=""
   local registry_auth=""
   local name
-  local apprise_sidecar_url="${APPRISE_SIDECAR_URL:-}"
-
+ 
   [ $supports_detach_option = true ] && detach_option="--detach=false"
   [ $supports_registry_auth = true ] && registry_auth="--with-registry-auth"
 
@@ -26,20 +25,15 @@ update_services() {
       if ! DOCKER_CLI_EXPERIMENTAL=enabled docker manifest inspect $image > /dev/null; then
         echo "Error updating service $name! Image $image does not exist or it is not available"
       else
-        echo "Trying to update service $name with image $image"
+        #echo "Trying to update service $name with image $image"
         docker service update "$name" $detach_option $registry_auth --image="$image" > /dev/null
 
         previousImage=$(docker service inspect "$name" -f '{{.PreviousSpec.TaskTemplate.ContainerSpec.Image}}')
         currentImage=$(docker service inspect "$name" -f '{{.Spec.TaskTemplate.ContainerSpec.Image}}')
         if [ "$previousImage" == "$currentImage" ]; then
-          echo "No updates to service $name!"
+          #echo "No updates to service $name!"
         else
           echo "Service $name was updated!"
-          if [[ "$apprise_sidecar_url" != "" ]]; then
-            title="[Shepherd] Service $name updated"
-            body="Service $name was updated from $previousImage to $currentImage"
-            curl -X POST -H "Content-Type: application/json" --data "{\"title\": \"$title\", \"body\": \"$body\"}" "$apprise_sidecar_url"
-          fi
         fi
       fi
     fi
@@ -49,7 +43,7 @@ update_services() {
 main() {
   local blacklist sleep_time supports_detach_option supports_registry_auth
   blacklist="${BLACKLIST_SERVICES:-}"
-  sleep_time="${SLEEP_TIME:-5m}"
+  sleep_time="${SLEEP_TIME:-10m}"
 
   supports_detach_option=false
   if [[ "$(server_version)" > "17.05" ]]; then
@@ -67,7 +61,7 @@ main() {
 
   while true; do
     update_services "$blacklist" "$supports_detach_option" "$supports_registry_auth"
-    echo "Sleeping $sleep_time before next update"
+    #echo "Sleeping $sleep_time before next update"
     sleep "$sleep_time"
   done
 }
