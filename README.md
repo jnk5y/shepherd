@@ -3,14 +3,14 @@
 [![Build Status](https://ci.strahlungsfrei.de/api/badges/djmaze/shepherd/status.svg)](https://ci.strahlungsfrei.de/djmaze/shepherd)
 [![Docker Stars](https://img.shields.io/docker/stars/jnk5y/shepherd.svg)](https://hub.docker.com/r/jnk5y/shepherd/) [![Docker Pulls](https://img.shields.io/docker/pulls/jnk5y/shepherd.svg)](https://hub.docker.com/r/jnk5y/shepherd/)
 
-A Docker swarm service for automatically updating your services whenever their base image is refreshed.
+A Docker swarm service for automatically updating your services whenever their base image is refreshed. I removed the alert and a lot of the logging from the original program. It only logs updated services.
 
 ## Usage
 
     docker service create --name shepherd \
                           --constraint "node.role==manager" \
                           --mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock,ro \
-                          mazzolino/shepherd
+                          jnk5y/shepherd
 
 ## Or with docker-compose
     version: "3"
@@ -18,7 +18,7 @@ A Docker swarm service for automatically updating your services whenever their b
       ...
       shepherd:
         build: .
-        image: mazzolino/shepherd
+        image: jnk5y/shepherd
         volumes:
           - /var/run/docker.sock:/var/run/docker.sock
         deploy:
