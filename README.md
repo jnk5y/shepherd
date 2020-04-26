@@ -1,7 +1,7 @@
 # Shepherd
 
 [![Build Status](https://ci.strahlungsfrei.de/api/badges/djmaze/shepherd/status.svg)](https://ci.strahlungsfrei.de/djmaze/shepherd)
-[![Docker Stars](https://img.shields.io/docker/stars/mazzolino/shepherd.svg)](https://hub.docker.com/r/mazzolino/shepherd/) [![Docker Pulls](https://img.shields.io/docker/pulls/mazzolino/shepherd.svg)](https://hub.docker.com/r/mazzolino/shepherd/)
+[![Docker Stars](https://img.shields.io/docker/stars/jnk5y/shepherd.svg)](https://hub.docker.com/r/jnk5y/shepherd/) [![Docker Pulls](https://img.shields.io/docker/pulls/jnk5y/shepherd.svg)](https://hub.docker.com/r/jnk5y/shepherd/)
 
 A Docker swarm service for automatically updating your services whenever their base image is refreshed.
 
