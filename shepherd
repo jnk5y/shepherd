@@ -30,9 +30,7 @@ update_services() {
 
         previousImage=$(docker service inspect "$name" -f '{{.PreviousSpec.TaskTemplate.ContainerSpec.Image}}')
         currentImage=$(docker service inspect "$name" -f '{{.Spec.TaskTemplate.ContainerSpec.Image}}')
-        if [ "$previousImage" == "$currentImage" ]; then
-          #echo "No updates to service $name!"
-        else
+        if [ "$previousImage" != "$currentImage" ]; then
           echo "Service $name was updated!"
         fi
       fi
