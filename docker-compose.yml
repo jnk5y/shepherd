@@ -10,7 +10,7 @@ services:
         constraints:
         - node.role == manager
     environment:
-      TZ: 'America/New_York'
+      TZ: 'US/Eastern'
       SLEEP_TIME: '10m'
       FILTER_SERVICES: ''
     restart: unless-stopped

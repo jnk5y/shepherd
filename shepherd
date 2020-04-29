@@ -39,9 +39,13 @@ update_services() {
 }
 
 main() {
-  local blacklist sleep_time supports_detach_option supports_registry_auth
+  local blacklist sleep_time supports_detach_option supports_registry_auth tz
   blacklist="${BLACKLIST_SERVICES:-}"
   sleep_time="${SLEEP_TIME:-10m}"
+  tz="${TZ:-EST}"
+
+  echo $tz > /etc/timezone
+  printf '%s %s\n' "$(date)" "Timezone set to $tz"
 
   supports_detach_option=false
   if [[ "$(server_version)" > "17.05" ]]; then
