@@ -27,6 +27,9 @@ A Docker swarm service for automatically updating your services every x minutes 
             constraints:
             - node.role == manager
 
+## Or with docker stack - This allows shepherd to update itself
+    docker stack deploy --compose-file docker-compose.yml shepherd
+
 ### Configuration
 
 Shepherd will try to update your services every 10 minutes by default. You can adjust this value using the `SLEEP_TIME` variable.
