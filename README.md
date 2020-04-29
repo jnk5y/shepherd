@@ -4,7 +4,7 @@
 [![Docker Stars](https://img.shields.io/docker/stars/jnk5y/shepherd.svg)](https://hub.docker.com/r/jnk5y/shepherd/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/jnk5y/shepherd.svg)](https://hub.docker.com/r/jnk5y/shepherd/)
 
-A Docker swarm service for automatically updating your services whenever their base image is refreshed. I removed the alert and a lot of the logging from the original program. It only logs updated services.
+A Docker swarm service for automatically updating your services every x minutes by running docker service update. I removed the alert and a lot of the logging from the original program as well as adding time stamps. It now only logs updated services.
 
 ## Usage
 
@@ -29,7 +29,7 @@ A Docker swarm service for automatically updating your services whenever their b
 
 ### Configuration
 
-Shepherd will try to update your services every 5 minutes by default. You can adjust this value using the `SLEEP_TIME` variable.
+Shepherd will try to update your services every 10 minutes by default. You can adjust this value using the `SLEEP_TIME` variable.
 
 You can prevent services from being updated by appending them to the `BLACKLIST_SERVICES` variable. This should be a space-separated list of service names.
 

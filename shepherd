@@ -23,7 +23,7 @@ update_services() {
       image=$(echo "$image_with_digest" | cut -d@ -f1)
 
       if ! DOCKER_CLI_EXPERIMENTAL=enabled docker manifest inspect $image > /dev/null; then
-        echo "Error updating service $name! Image $image does not exist or it is not available"
+      	printf '%s %s\n' "$(date)" "Error updating service $name! Image $image does not exist or it is not available"
       else
         #echo "Trying to update service $name with image $image"
         docker service update "$name" $detach_option $registry_auth --image="$image" > /dev/null
@@ -31,7 +31,7 @@ update_services() {
         previousImage=$(docker service inspect "$name" -f '{{.PreviousSpec.TaskTemplate.ContainerSpec.Image}}')
         currentImage=$(docker service inspect "$name" -f '{{.Spec.TaskTemplate.ContainerSpec.Image}}')
         if [ "$previousImage" != "$currentImage" ]; then
-          echo "Service $name was updated!"
+          printf '%s %s\n' "$(date)" "Service $name was updated!"
         fi
       fi
     fi
@@ -46,20 +46,22 @@ main() {
   supports_detach_option=false
   if [[ "$(server_version)" > "17.05" ]]; then
     supports_detach_option=true
-    echo "Enabling synchronous service updates"
+    printf '%s %s\n' "$(date)" "Enabling synchronous service updates"
+    printf '%s %s\n' "$(date)" "Sleep timer is set to $sleep_time"
+   
   fi
 
   supports_registry_auth=false
   if [[ ${WITH_REGISTRY_AUTH+x} ]]; then
     supports_registry_auth=true
-    echo "Send registry authentication details to swarm agents"
+    printf '%s %s\n' "$(date)" "Send registry authentication details to swarm agents"
   fi
 
-  [[ "$blacklist" != "" ]] && echo "Excluding services: $blacklist"
+  [[ "$blacklist" != "" ]] && printf '%s %s\n' "$(date)" "Excluding services: $blacklist"
 
   while true; do
     update_services "$blacklist" "$supports_detach_option" "$supports_registry_auth"
-    #echo "Sleeping $sleep_time before next update"
+    #printf '%s %s\n' "$(date)" ""Sleeping $sleep_time before next update"
     sleep "$sleep_time"
   done
 }
