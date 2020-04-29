@@ -11,4 +11,6 @@ services:
         - node.role == manager
     environment:
       TZ: 'America/New_York'
+      SLEEP_TIME: '10m'
+      FILTER_SERVICES: ''
     restart: unless-stopped
