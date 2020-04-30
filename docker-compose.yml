@@ -2,8 +2,7 @@ version: "3"
 
 services:
   app:
-    #image: jnk5y/shepherd
-    image: shepherd-test
+    image: jnk5y/shepherd
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     deploy:
