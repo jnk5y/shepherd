@@ -25,13 +25,15 @@ update_services() {
       if ! DOCKER_CLI_EXPERIMENTAL=enabled docker manifest inspect $image > /dev/null; then
       	printf '%s %s\n' "$(date)" "Error updating service $name! Image $image does not exist or it is not available"
       else
-        #echo "Trying to update service $name with image $image"
+        if [ $verbose != 'false' ]; then printf '%s %s\n' "$(date)" "Trying to update service $name with image $image"; fi
         docker service update "$name" $detach_option $registry_auth --image="$image" > /dev/null
 
         previousImage=$(docker service inspect "$name" -f '{{.PreviousSpec.TaskTemplate.ContainerSpec.Image}}')
         currentImage=$(docker service inspect "$name" -f '{{.Spec.TaskTemplate.ContainerSpec.Image}}')
         if [ "$previousImage" != "$currentImage" ]; then
           printf '%s %s\n' "$(date)" "Service $name was updated!"
+	else
+	  if [ $verbose != 'false' ]; then printf '%s %s\n' "$(date)" "No updates to service $name"; fi
         fi
       fi
     fi
@@ -39,10 +41,11 @@ update_services() {
 }
 
 main() {
-  local blacklist sleep_time supports_detach_option supports_registry_auth tz
+  local blacklist sleep_time supports_detach_option supports_registry_auth tz verbose
   blacklist="${BLACKLIST_SERVICES:-}"
   sleep_time="${SLEEP_TIME:-10m}"
   tz="${TZ:-EST}"
+  verbose="${VERBOSE:-false}"
 
   echo $tz > /etc/timezone
   printf '%s %s\n' "$(date)" "Timezone set to $tz"
@@ -65,7 +68,7 @@ main() {
 
   while true; do
     update_services "$blacklist" "$supports_detach_option" "$supports_registry_auth"
-    #printf '%s %s\n' "$(date)" ""Sleeping $sleep_time before next update"
+    if [ $verbose != 'false' ]; then printf '%s %s\n' "$(date)" "Sleeping $sleep_time before next update"; fi
     sleep "$sleep_time"
   done
 }
