@@ -4,10 +4,9 @@
 [![Docker Stars](https://img.shields.io/docker/stars/jnk5y/shepherd.svg)](https://hub.docker.com/r/jnk5y/shepherd/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/jnk5y/shepherd.svg)](https://hub.docker.com/r/jnk5y/shepherd/)
 
-A Docker swarm service for automatically updating your services every x minutes by running docker service update. I removed the alert and a lot of the logging from the original program as well as adding time stamps. It now only logs updated services.
+A Docker swarm service for automatically updating your services every x minutes by running docker service update. I reduced default logging and added a verbose environment variable to allow for more logging statements. I also added timestamps to the logs and added a timezone environment variable to set the container's timezone.
 
 ## Usage
-
     docker service create --name shepherd \
                           --constraint "node.role==manager" \
                           --mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock,ro \
@@ -16,9 +15,7 @@ A Docker swarm service for automatically updating your services every x minutes 
 ## Or with docker-compose
     version: "3"
     services:
-      ...
-      shepherd:
-        build: .
+      app:
         image: jnk5y/shepherd
         volumes:
           - /var/run/docker.sock:/var/run/docker.sock
@@ -26,6 +23,11 @@ A Docker swarm service for automatically updating your services every x minutes 
           placement:
             constraints:
             - node.role == manager
+        environment:
+          TZ: 'US/Eastern'
+          SLEEP_TIME: '10m'
+          FILTER_SERVICES: ''
+          VERBOSE: 'false'
 
 ## Or with docker stack - This allows shepherd to update itself
     docker stack deploy --compose-file docker-compose.yml shepherd
