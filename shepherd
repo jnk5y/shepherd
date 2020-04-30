@@ -23,17 +23,17 @@ update_services() {
       image=$(echo "$image_with_digest" | cut -d@ -f1)
 
       if ! DOCKER_CLI_EXPERIMENTAL=enabled docker manifest inspect $image > /dev/null; then
-      	printf '%s %s\n' "$(date)" "Error updating service $name! Image $image does not exist or it is not available"
+      	echo "$(date) Error updating service $name! Image $image does not exist or it is not available"
       else
-        if [ $verbose != 'false' ]; then printf '%s %s\n' "$(date)" "Trying to update service $name with image $image"; fi
+	if [ $verbose != 'false' ]; then echo "$(date) Trying to update service $name with image $image"; fi
         docker service update "$name" $detach_option $registry_auth --image="$image" > /dev/null
 
         previousImage=$(docker service inspect "$name" -f '{{.PreviousSpec.TaskTemplate.ContainerSpec.Image}}')
         currentImage=$(docker service inspect "$name" -f '{{.Spec.TaskTemplate.ContainerSpec.Image}}')
         if [ "$previousImage" != "$currentImage" ]; then
-          printf '%s %s\n' "$(date)" "Service $name was updated!"
+          echo "$(date) Service $name was updated!"
 	else
-	  if [ $verbose != 'false' ]; then printf '%s %s\n' "$(date)" "No updates to service $name"; fi
+	  if [ $verbose != 'false' ]; then echo "$(date) No updates to service $name"; fi
         fi
       fi
     fi
@@ -48,27 +48,26 @@ main() {
   verbose="${VERBOSE:-false}"
 
   echo $tz > /etc/timezone
-  printf '%s %s\n' "$(date)" "Timezone set to $tz"
+  echo "$(date) Timezone set to $tz"
 
   supports_detach_option=false
   if [[ "$(server_version)" > "17.05" ]]; then
     supports_detach_option=true
-    printf '%s %s\n' "$(date)" "Enabling synchronous service updates"
-    printf '%s %s\n' "$(date)" "Sleep timer is set to $sleep_time"
-   
+    echo "$(date) Enabling synchronous service updates"
+    echo "$(date) Sleep timer is set to $sleep_time"
   fi
 
   supports_registry_auth=false
   if [[ ${WITH_REGISTRY_AUTH+x} ]]; then
     supports_registry_auth=true
-    printf '%s %s\n' "$(date)" "Send registry authentication details to swarm agents"
+    echo "$(date) Send registry authentication details to swarm agents"
   fi
 
-  [[ "$blacklist" != "" ]] && printf '%s %s\n' "$(date)" "Excluding services: $blacklist"
+  [[ "$blacklist" != "" ]] && echo "$(date) Excluding services: $blacklist"
 
   while true; do
     update_services "$blacklist" "$supports_detach_option" "$supports_registry_auth"
-    if [ $verbose != 'false' ]; then printf '%s %s\n' "$(date)" "Sleeping $sleep_time before next update"; fi
+    if [ $verbose != 'false' ]; then echo "$(date) Sleeping $sleep_time before next update"; fi
     sleep "$sleep_time"
   done
 }
