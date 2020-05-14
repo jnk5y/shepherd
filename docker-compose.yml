@@ -13,5 +13,5 @@ services:
       TZ: 'US/Eastern'
       SLEEP_TIME: '10m'
       FILTER_SERVICES: ''
-      VERBOSE: 'false'
+      VERBOSE: 'true'
     restart: unless-stopped

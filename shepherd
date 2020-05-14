@@ -5,6 +5,15 @@ server_version() {
   docker version -f "{{.Server.Version}}"
 }
 
+logger() {
+  local log="$1"
+  local is_verbose_log="$2"
+  
+  if [ ($is_verbose_log = "true" && $verbose = 'true') || $is_verbose_log = 'false' ]; then
+    echo "$(date) log"
+  fi
+}
+
 update_services() {
   local blacklist="$1"
   local supports_detach_option=$2
@@ -23,17 +32,17 @@ update_services() {
       image=$(echo "$image_with_digest" | cut -d@ -f1)
 
       if ! DOCKER_CLI_EXPERIMENTAL=enabled docker manifest inspect $image > /dev/null; then
-      	echo "$(date) Error updating service $name! Image $image does not exist or it is not available"
+      	logger "Error updating service $name! Image $image does not exist or it is not available" "false"
       else
-	if [ $verbose != 'false' ]; then echo "$(date) Trying to update service $name with image $image"; fi
+	if [ $verbose != 'false' ]; then logger "Trying to update service $name with image $image"; fi
         docker service update "$name" $detach_option $registry_auth --image="$image" > /dev/null
 
         previousImage=$(docker service inspect "$name" -f '{{.PreviousSpec.TaskTemplate.ContainerSpec.Image}}')
         currentImage=$(docker service inspect "$name" -f '{{.Spec.TaskTemplate.ContainerSpec.Image}}')
         if [ "$previousImage" != "$currentImage" ]; then
-          echo "$(date) Service $name was updated!"
+          logger "Service $name was updated!"
 	else
-	  if [ $verbose != 'false' ]; then echo "$(date) No updates to service $name"; fi
+	  if [ $verbose != 'false' ]; then logger "No updates to service $name"; fi
         fi
       fi
     fi
@@ -45,29 +54,29 @@ main() {
   blacklist="${BLACKLIST_SERVICES:-}"
   sleep_time="${SLEEP_TIME:-10m}"
   tz="${TZ:-EST}"
-  verbose="${VERBOSE:-false}"
+  verbose="${VERBOSE:-true}"
 
   echo $tz > /etc/timezone
-  echo "$(date) Timezone set to $tz"
+  logger "Timezone set to $tz"
 
   supports_detach_option=false
   if [[ "$(server_version)" > "17.05" ]]; then
     supports_detach_option=true
-    echo "$(date) Enabling synchronous service updates"
-    echo "$(date) Sleep timer is set to $sleep_time"
+    logger "Enabling synchronous service updates"
+    logger "Sleep timer is set to $sleep_time"
   fi
 
   supports_registry_auth=false
   if [[ ${WITH_REGISTRY_AUTH+x} ]]; then
     supports_registry_auth=true
-    echo "$(date) Send registry authentication details to swarm agents"
+    logger "Send registry authentication details to swarm agents" "false"
   fi
 
-  [[ "$blacklist" != "" ]] && echo "$(date) Excluding services: $blacklist"
+  [[ "$blacklist" != "" ]] && logger "Excluding services: $blacklist"
 
   while true; do
     update_services "$blacklist" "$supports_detach_option" "$supports_registry_auth"
-    if [ $verbose != 'false' ]; then echo "$(date) Sleeping $sleep_time before next update"; fi
+    logger "Sleeping $sleep_time before next update" "true"
     sleep "$sleep_time"
   done
 }
