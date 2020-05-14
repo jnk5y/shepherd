@@ -6,9 +6,8 @@ server_version() {
 }
 
 logger() {
-  local log is_verbose_log
-  log="$1"
-  is_verbose_log="$2"
+  local log="$1"
+  local is_verbose_log="${2:-false}"
   
   if (is_verbose_log="true" && $verbose='true') || is_verbose_log='false'; then
     echo "$(date) log"
@@ -33,9 +32,9 @@ update_services() {
       image=$(echo "$image_with_digest" | cut -d@ -f1)
 
       if ! DOCKER_CLI_EXPERIMENTAL=enabled docker manifest inspect $image > /dev/null; then
-      	logger "Error updating service $name! Image $image does not exist or it is not available" "false"
+      	logger "Error updating service $name! Image $image does not exist or it is not available"
       else
-	if [ $verbose != 'false' ]; then logger "Trying to update service $name with image $image"; fi
+	logger "Trying to update service $name with image $image" "true"
         docker service update "$name" $detach_option $registry_auth --image="$image" > /dev/null
 
         previousImage=$(docker service inspect "$name" -f '{{.PreviousSpec.TaskTemplate.ContainerSpec.Image}}')
@@ -43,7 +42,7 @@ update_services() {
         if [ "$previousImage" != "$currentImage" ]; then
           logger "Service $name was updated!"
 	else
-	  if [ $verbose != 'false' ]; then logger "No updates to service $name"; fi
+	  logger "No updates to service $name" "true"
         fi
       fi
     fi
@@ -70,7 +69,7 @@ main() {
   supports_registry_auth=false
   if [[ ${WITH_REGISTRY_AUTH+x} ]]; then
     supports_registry_auth=true
-    logger "Send registry authentication details to swarm agents" "false"
+    logger "Send registry authentication details to swarm agents"
   fi
 
   [[ "$blacklist" != "" ]] && logger "Excluding services: $blacklist"
