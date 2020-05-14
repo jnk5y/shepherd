@@ -6,10 +6,11 @@ server_version() {
 }
 
 logger() {
-  local log="$1"
-  local is_verbose_log="$2"
+  local log is_verbose_log
+  log="$1"
+  is_verbose_log="$2"
   
-  if [ ($is_verbose_log = "true" && $verbose = 'true') || $is_verbose_log = 'false' ]; then
+  if (is_verbose_log="true" && $verbose='true') || is_verbose_log='false'; then
     echo "$(date) log"
   fi
 }
