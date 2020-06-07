@@ -56,7 +56,7 @@ main() {
   tz="${TZ:-EST}"
   verbose="${VERBOSE:-true}"
 
-  echo $tz > /etc/timezone
+  #echo $tz > /etc/timezone
   logger "Timezone set to $tz"
 
   supports_detach_option=false
